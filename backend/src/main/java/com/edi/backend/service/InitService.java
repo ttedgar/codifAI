@@ -46,21 +46,23 @@ public class InitService implements CommandLineRunner {
                 .starterCode("function add(a, b) {\n  // Your code here\n}")
                 .hiddenTests(
                     """
-                        function add(a, b) {
-                          // USER CODE WILL BE INSERTED HERE
-                        }
-                        
                         // Test cases
-                        const test1 = add(2, 3) === 5;
-                        const test2 = add(0, 0) === 0;
-                        const test3 = add(-1, 1) === 0;
-                        const test4 = add(10, 20) === 30;
-                        const test5 = add(-5, -3) === -8;
-                        
-                        const passed = [test1, test2, test3, test4, test5].filter(Boolean).length;
-                        console.log(`Passed ${passed}/5 tests`);
-                        if (passed === 5) console.log('All tests passed!');
-                        else process.exit(1);"""
+                        console.log(add(2, 3) === 5 ? 'PASS: add(2, 3) should return 5' : 'FAIL: add(2, 3) should return 5');
+                        console.log(add(0, 0) === 0 ? 'PASS: add(0, 0) should return 0' : 'FAIL: add(0, 0) should return 0');
+                        console.log(add(-1, 1) === 0 ? 'PASS: add(-1, 1) should return 0' : 'FAIL: add(-1, 1) should return 0');
+                        console.log(add(10, 20) === 30 ? 'PASS: add(10, 20) should return 30' : 'FAIL: add(10, 20) should return 30');
+                        console.log(add(-5, -3) === -8 ? 'PASS: add(-5, -3) should return -8' : 'FAIL: add(-5, -3) should return -8');
+
+                        // Count results
+                        const output = [
+                          add(2, 3) === 5,
+                          add(0, 0) === 0,
+                          add(-1, 1) === 0,
+                          add(10, 20) === 30,
+                          add(-5, -3) === -8
+                        ];
+                        const passed = output.filter(Boolean).length;
+                        console.log(`RESULT:${passed}/5`);"""
                 )
                 .sampleTests(
                     """
@@ -90,21 +92,23 @@ public class InitService implements CommandLineRunner {
                 .starterCode("function sumArray(numbers) {\n  // Your code here\n}")
                 .hiddenTests(
                     """
-                        function sumArray(numbers) {
-                          // USER CODE WILL BE INSERTED HERE
-                        }
-                        
                         // Test cases
-                        const test1 = sumArray([1, 2, 3]) === 6;
-                        const test2 = sumArray([]) === 0;
-                        const test3 = sumArray([10]) === 10;
-                        const test4 = sumArray([-1, -2, -3]) === -6;
-                        const test5 = sumArray([1, 2, 3, 4, 5]) === 15;
-                        
-                        const passed = [test1, test2, test3, test4, test5].filter(Boolean).length;
-                        console.log(`Passed ${passed}/5 tests`);
-                        if (passed === 5) console.log('All tests passed!');
-                        else process.exit(1);"""
+                        console.log(sumArray([1, 2, 3]) === 6 ? 'PASS: sumArray([1, 2, 3]) should return 6' : 'FAIL: sumArray([1, 2, 3]) should return 6');
+                        console.log(sumArray([]) === 0 ? 'PASS: sumArray([]) should return 0' : 'FAIL: sumArray([]) should return 0');
+                        console.log(sumArray([10]) === 10 ? 'PASS: sumArray([10]) should return 10' : 'FAIL: sumArray([10]) should return 10');
+                        console.log(sumArray([-1, -2, -3]) === -6 ? 'PASS: sumArray([-1, -2, -3]) should return -6' : 'FAIL: sumArray([-1, -2, -3]) should return -6');
+                        console.log(sumArray([1, 2, 3, 4, 5]) === 15 ? 'PASS: sumArray([1, 2, 3, 4, 5]) should return 15' : 'FAIL: sumArray([1, 2, 3, 4, 5]) should return 15');
+
+                        // Count results
+                        const output = [
+                          sumArray([1, 2, 3]) === 6,
+                          sumArray([]) === 0,
+                          sumArray([10]) === 10,
+                          sumArray([-1, -2, -3]) === -6,
+                          sumArray([1, 2, 3, 4, 5]) === 15
+                        ];
+                        const passed = output.filter(Boolean).length;
+                        console.log(`RESULT:${passed}/5`);"""
                 )
                 .sampleTests(
                     """
@@ -134,21 +138,23 @@ public class InitService implements CommandLineRunner {
                 .starterCode("function doubleNumber(n) {\n  // Your code here\n}")
                 .hiddenTests(
                     """
-                        function doubleNumber(n) {
-                          // USER CODE WILL BE INSERTED HERE
-                        }
-                        
                         // Test cases
-                        const test1 = doubleNumber(5) === 10;
-                        const test2 = doubleNumber(0) === 0;
-                        const test3 = doubleNumber(-3) === -6;
-                        const test4 = doubleNumber(100) === 200;
-                        const test5 = doubleNumber(2.5) === 5;
-                        
-                        const passed = [test1, test2, test3, test4, test5].filter(Boolean).length;
-                        console.log(`Passed ${passed}/5 tests`);
-                        if (passed === 5) console.log('All tests passed!');
-                        else process.exit(1);"""
+                        console.log(doubleNumber(5) === 10 ? 'PASS: doubleNumber(5) should return 10' : 'FAIL: doubleNumber(5) should return 10');
+                        console.log(doubleNumber(0) === 0 ? 'PASS: doubleNumber(0) should return 0' : 'FAIL: doubleNumber(0) should return 0');
+                        console.log(doubleNumber(-3) === -6 ? 'PASS: doubleNumber(-3) should return -6' : 'FAIL: doubleNumber(-3) should return -6');
+                        console.log(doubleNumber(100) === 200 ? 'PASS: doubleNumber(100) should return 200' : 'FAIL: doubleNumber(100) should return 200');
+                        console.log(doubleNumber(2.5) === 5 ? 'PASS: doubleNumber(2.5) should return 5' : 'FAIL: doubleNumber(2.5) should return 5');
+
+                        // Count results
+                        const output = [
+                          doubleNumber(5) === 10,
+                          doubleNumber(0) === 0,
+                          doubleNumber(-3) === -6,
+                          doubleNumber(100) === 200,
+                          doubleNumber(2.5) === 5
+                        ];
+                        const passed = output.filter(Boolean).length;
+                        console.log(`RESULT:${passed}/5`);"""
                 )
                 .sampleTests(
                     """

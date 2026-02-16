@@ -21,6 +21,7 @@ services:
   judge0-server:
     image: judge0/judge0:1.13.1
     container_name: codifai-judge0
+    privileged: true
     environment:
       - REDIS_HOST=judge0-redis
       - POSTGRES_HOST=judge0-db
@@ -29,6 +30,11 @@ services:
       - POSTGRES_DB=judge0
     ports:
       - "2358:2358"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    tmpfs:
+      - /tmp:exec,mode=777
+    shm_size: '2gb'
     depends_on:
       judge0-db:
         condition: service_healthy

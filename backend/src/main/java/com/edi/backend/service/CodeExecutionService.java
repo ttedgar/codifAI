@@ -9,6 +9,8 @@ import com.edi.backend.entity.User;
 import com.edi.backend.repository.ChallengeRepository;
 import com.edi.backend.repository.SubmissionRepository;
 import com.edi.backend.repository.UserRepository;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -97,13 +99,61 @@ public class CodeExecutionService {
     private SubmissionStatus determineStatus(Judge0ResultResponse result) {
         Integer statusId = result.getStatus().getId();
 
-        return switch (statusId) {
-            case 3 -> SubmissionStatus.ACCEPTED;
-            case 4 -> SubmissionStatus.WRONG_ANSWER;
-            case 5 -> SubmissionStatus.TIME_LIMIT_EXCEEDED;
-            case 6 -> SubmissionStatus.COMPILATION_ERROR;
-            default -> SubmissionStatus.RUNTIME_ERROR;
-        };
+        // Check for compilation/runtime errors first
+        if (statusId == 6) {
+            return SubmissionStatus.COMPILATION_ERROR;
+        }
+        if (statusId == 5) {
+            return SubmissionStatus.TIME_LIMIT_EXCEEDED;
+        }
+        if (statusId != 3) {
+            return SubmissionStatus.RUNTIME_ERROR;
+        }
+
+        // Status 3 = Accepted by Judge0, now parse test results from stdout
+        TestResult testResult = parseTestOutput(result.getStdout());
+
+        // If any test failed, mark as WRONG_ANSWER
+        if (testResult.getFailed() > 0) {
+            return SubmissionStatus.WRONG_ANSWER;
+        }
+
+        // All tests passed
+        if (testResult.getPassed() > 0) {
+            return SubmissionStatus.ACCEPTED;
+        }
+
+        // No test output found - treat as runtime error
+        return SubmissionStatus.RUNTIME_ERROR;
+    }
+
+    /**
+     * Parse test output to count PASS/FAIL lines
+     */
+    private TestResult parseTestOutput(String stdout) {
+        if (stdout == null || stdout.isEmpty()) {
+            return new TestResult(0, 0);
+        }
+
+        long passCount = stdout.lines()
+                .filter(line -> line.trim().startsWith("PASS"))
+                .count();
+
+        long failCount = stdout.lines()
+                .filter(line -> line.trim().startsWith("FAIL"))
+                .count();
+
+        return new TestResult((int) passCount, (int) failCount);
+    }
+
+    /**
+     * Internal class to hold test result counts
+     */
+    @Data
+    @AllArgsConstructor
+    private static class TestResult {
+        int passed;
+        int failed;
     }
 
     /**
