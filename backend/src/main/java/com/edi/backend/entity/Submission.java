@@ -5,33 +5,39 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users")
+@Table(name = "submissions")
 @Getter
 @Setter
-@ToString(exclude = "password")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class Submission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String username;
-
-    @Column(nullable = false, unique = true)
-    private String email;
+    @Column(nullable = false)
+    private Long userId;
 
     @Column(nullable = false)
-    private String password;
+    private Long challengeId;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String code;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.USER;
+    private SubmissionStatus status;
 
-    @Column(nullable = false)
-    private Integer xp = 0;
+    @Column(columnDefinition = "TEXT")
+    private String stdout;
+
+    @Column(columnDefinition = "TEXT")
+    private String stderr;
+
+    private Integer executionTime;
+
+    private Integer memory;
 
     private LocalDateTime createdAt;
 

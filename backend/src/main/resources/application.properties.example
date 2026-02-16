@@ -18,3 +18,7 @@ spring.jpa.open-in-view=false
 # Connection Pool (HikariCP - default in Spring Boot)
 spring.datasource.hikari.maximum-pool-size=10
 spring.datasource.hikari.connection-timeout=20000
+
+# JWT Configuration
+jwt.secret=YourSecretKeyHereMustBeAtLeast256BitsLongForHS256Algorithm
+jwt.expiration=86400000
