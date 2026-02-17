@@ -4,7 +4,9 @@ import com.edi.backend.dto.AuthResponse;
 import com.edi.backend.dto.LoginRequest;
 import com.edi.backend.dto.RegisterRequest;
 import com.edi.backend.entity.Role;
+import com.edi.backend.entity.SubmissionStatus;
 import com.edi.backend.entity.User;
+import com.edi.backend.repository.SubmissionRepository;
 import com.edi.backend.repository.UserRepository;
 import com.edi.backend.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -24,6 +28,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private final SubmissionRepository submissionRepository;
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -52,6 +57,7 @@ public class AuthService {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole().name())
+                .acceptedChallengeIds(List.of())
                 .build();
     }
 
@@ -66,12 +72,15 @@ public class AuthService {
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
         String token = jwtUtil.generateToken(userDetails);
 
+        var acceptedChallengeIds = submissionRepository.findChallengeIdsByUserIdAndStatus(user.getId(), SubmissionStatus.ACCEPTED);
+
         return AuthResponse.builder()
                 .token(token)
                 .userId(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole().name())
+                .acceptedChallengeIds(acceptedChallengeIds)
                 .build();
     }
 }

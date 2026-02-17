@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     boolean existsByUserIdAndChallengeIdAndStatus(Long userId, Long challengeId, SubmissionStatus status);
+
+    List<Long> findChallengeIdsByUserIdAndStatus(Long userId, SubmissionStatus status);
 }

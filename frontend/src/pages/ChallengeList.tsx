@@ -4,9 +4,9 @@ import { ChallengeCard } from '../components/ChallengeCard';
 import { AuthForm } from '../components/AuthForm';
 
 interface ChallengeListProps {
-  auth: { username: string; email: string } | null;
+  auth: { username: string; email: string; acceptedChallengeIds: number[] } | null;
   onLogout: () => void;
-  onAuthSuccess: (username: string, email: string) => void;
+  onAuthSuccess: (username: string, email: string, acceptedChallengeIds?: number[]) => void;
   onChallengeClick: (challenge: ChallengeResponse) => void;
 }
 
@@ -180,6 +180,7 @@ export function ChallengeList({ auth, onLogout, onAuthSuccess, onChallengeClick 
                   key={challenge.id}
                   challenge={challenge}
                   onClick={() => onChallengeClick(challenge)}
+                  isAccepted={auth ? auth.acceptedChallengeIds.includes(challenge.id!) : false}
                 />
               ))}
             </div>

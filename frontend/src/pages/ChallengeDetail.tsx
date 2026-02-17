@@ -8,6 +8,8 @@ interface ChallengeDetailProps {
   auth: { username: string; email: string } | null;
   onBack: () => void;
   onLogout: () => void;
+  isAccepted?: boolean;
+  onSubmissionAccepted?: (challengeId: number) => void;
 }
 
 const statusColors = {
@@ -24,6 +26,8 @@ export function ChallengeDetail({
   auth,
   onBack,
   onLogout,
+  isAccepted,
+  onSubmissionAccepted,
 }: ChallengeDetailProps) {
   const [code, setCode] = useState(challenge.starterCode || '');
   const [submission, setSubmission] = useState<SubmissionResponse | null>(null);
@@ -45,6 +49,9 @@ export function ChallengeDetail({
         code,
       });
       setSubmission(response);
+      if (response.status === 'ACCEPTED' && onSubmissionAccepted) {
+        onSubmissionAccepted(challenge.id!);
+      }
     } catch (err: any) {
       setError(err?.body?.message || 'Submission failed. Please try again.');
       console.error('Submission error:', err);
@@ -124,9 +131,23 @@ export function ChallengeDetail({
         {/* Challenge Title and Info */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-              {challenge.title}
-            </h2>
+            <div className="flex items-center gap-4">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                {challenge.title}
+              </h2>
+              {isAccepted && (
+                <div className="flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
+                  <svg
+                    className="w-5 h-5 text-green-600 dark:text-green-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-sm font-medium text-green-700 dark:text-green-400">Solved</span>
+                </div>
+              )}
+            </div>
             <span
               className={`px-4 py-2 text-sm font-medium rounded-full ${
                 challenge.difficulty === 'EASY'

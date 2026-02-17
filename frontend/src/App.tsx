@@ -6,6 +6,7 @@ import { ChallengeResponse } from './api';
 interface AuthState {
   username: string;
   email: string;
+  acceptedChallengeIds: number[];
 }
 
 function App() {
@@ -18,9 +19,14 @@ function App() {
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('username');
     const email = localStorage.getItem('email');
+    const acceptedChallengeIdsStr = localStorage.getItem('acceptedChallengeIds');
 
     if (token && username && email) {
-      setAuth({ username, email });
+      setAuth({
+        username,
+        email,
+        acceptedChallengeIds: acceptedChallengeIdsStr ? JSON.parse(acceptedChallengeIdsStr) : [],
+      });
     }
   }, []);
 
@@ -28,11 +34,25 @@ function App() {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     localStorage.removeItem('email');
+    localStorage.removeItem('acceptedChallengeIds');
     setAuth(null);
   };
 
-  const handleAuthSuccess = (username: string, email: string) => {
-    setAuth({ username, email });
+  const handleAuthSuccess = (
+    username: string,
+    email: string,
+    acceptedChallengeIds: number[] = []
+  ) => {
+    setAuth({ username, email, acceptedChallengeIds });
+  };
+
+  const addAcceptedChallenge = (challengeId: number) => {
+    if (auth) {
+      const updated = [...auth.acceptedChallengeIds, challengeId];
+      const updatedAuth = { ...auth, acceptedChallengeIds: updated };
+      setAuth(updatedAuth);
+      localStorage.setItem('acceptedChallengeIds', JSON.stringify(updated));
+    }
   };
 
   const handleChallengeClick = (challenge: ChallengeResponse) => {
@@ -60,6 +80,8 @@ function App() {
           auth={auth}
           onBack={handleBack}
           onLogout={handleLogout}
+          onSubmissionAccepted={addAcceptedChallenge}
+          isAccepted={auth ? auth.acceptedChallengeIds.includes(selectedChallenge!.id!) : false}
         />
       )}
     </>
