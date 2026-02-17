@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { ChallengeList } from './pages/ChallengeList';
 import { ChallengeDetail } from './pages/ChallengeDetail';
-import { ChallengeResponse } from './api';
 
 interface AuthState {
   username: string;
@@ -11,8 +11,7 @@ interface AuthState {
 
 function App() {
   const [auth, setAuth] = useState<AuthState | null>(null);
-  const [currentPage, setCurrentPage] = useState<'list' | 'detail'>('list');
-  const [selectedChallenge, setSelectedChallenge] = useState<ChallengeResponse | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check if user is already logged in
@@ -55,36 +54,40 @@ function App() {
     }
   };
 
-  const handleChallengeClick = (challenge: ChallengeResponse) => {
-    setSelectedChallenge(challenge);
-    setCurrentPage('detail');
+  const handleChallengeClick = (challengeId: number) => {
+    navigate(`/challenge?id=${challengeId}`);
   };
 
   const handleBack = () => {
-    setCurrentPage('list');
-    setSelectedChallenge(null);
+    navigate('/');
   };
 
   return (
-    <>
-      {currentPage === 'list' ? (
-        <ChallengeList
-          auth={auth}
-          onLogout={handleLogout}
-          onAuthSuccess={handleAuthSuccess}
-          onChallengeClick={handleChallengeClick}
-        />
-      ) : (
-        <ChallengeDetail
-          challenge={selectedChallenge!}
-          auth={auth}
-          onBack={handleBack}
-          onLogout={handleLogout}
-          onSubmissionAccepted={addAcceptedChallenge}
-          isAccepted={auth ? auth.acceptedChallengeIds.includes(selectedChallenge!.id!) : false}
-        />
-      )}
-    </>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ChallengeList
+            auth={auth}
+            onLogout={handleLogout}
+            onAuthSuccess={handleAuthSuccess}
+            onChallengeClick={handleChallengeClick}
+          />
+        }
+      />
+      <Route
+        path="/challenge"
+        element={
+          <ChallengeDetail
+            auth={auth}
+            onBack={handleBack}
+            onLogout={handleLogout}
+            onSubmissionAccepted={addAcceptedChallenge}
+            isAccepted={auth?.acceptedChallengeIds || []}
+          />
+        }
+      />
+    </Routes>
   );
 }
 

@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { ChallengeResponse, SubmissionsService, SubmissionResponse } from '../api';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { ChallengesService, ChallengeResponse, SubmissionsService, SubmissionResponse } from '../api';
 import { AuthForm } from '../components/AuthForm';
 import { Fireworks } from '../components/Fireworks';
 
 interface ChallengeDetailProps {
-  challenge: ChallengeResponse;
   auth: { username: string; email: string } | null;
   onBack: () => void;
   onLogout: () => void;
-  isAccepted?: boolean;
+  isAccepted?: number[];
   onSubmissionAccepted?: (challengeId: number) => void;
 }
 
@@ -22,17 +22,44 @@ const statusColors = {
 };
 
 export function ChallengeDetail({
-  challenge,
   auth,
   onBack,
   onLogout,
-  isAccepted,
+  isAccepted = [],
   onSubmissionAccepted,
 }: ChallengeDetailProps) {
-  const [code, setCode] = useState(challenge.starterCode || '');
+  const [searchParams] = useSearchParams();
+  const [challenge, setChallenge] = useState<ChallengeResponse | null>(null);
+  const [code, setCode] = useState('');
   const [submission, setSubmission] = useState<SubmissionResponse | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const challengeId = searchParams.get('id');
+    if (!challengeId) {
+      setError('Challenge ID not provided');
+      setLoading(false);
+      return;
+    }
+
+    const fetchChallenge = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const ch = await ChallengesService.getChallengeById(parseInt(challengeId));
+        setChallenge(ch);
+        setCode(ch.starterCode || '');
+      } catch (err) {
+        setError('Failed to load challenge. Please try again later.');
+        console.error('Error loading challenge:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChallenge();
+  }, [searchParams]);
 
   const handleSubmit = async () => {
     if (!auth) {
@@ -85,6 +112,53 @@ export function ChallengeDetail({
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-CodePurple"></div>
+      </div>
+    );
+  }
+
+  if (error || !challenge) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+        <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-800">
+          <div className="container mx-auto px-4 py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={onBack}
+                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-CodePurple dark:hover:text-CodeLightPurple font-medium transition-colors"
+                >
+                  ← Back
+                </button>
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                    Codif<span className="text-CodePurple">AI</span>
+                  </h1>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+        <main className="container mx-auto px-4 py-8">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
+            <p className="text-red-700 dark:text-red-300 font-medium">
+              {error || 'Challenge not found'}
+            </p>
+            <button
+              onClick={onBack}
+              className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+            >
+              Go Back
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {submission?.status === 'ACCEPTED' && <Fireworks />}
@@ -135,7 +209,7 @@ export function ChallengeDetail({
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
                 {challenge.title}
               </h2>
-              {isAccepted && (
+              {isAccepted.includes(challenge.id!) && (
                 <div className="flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
                   <svg
                     className="w-5 h-5 text-green-600 dark:text-green-400"

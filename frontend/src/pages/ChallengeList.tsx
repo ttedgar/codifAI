@@ -7,7 +7,7 @@ interface ChallengeListProps {
   auth: { username: string; email: string; acceptedChallengeIds: number[] } | null;
   onLogout: () => void;
   onAuthSuccess: (username: string, email: string, acceptedChallengeIds?: number[]) => void;
-  onChallengeClick: (challenge: ChallengeResponse) => void;
+  onChallengeClick: (challengeId: number) => void;
 }
 
 export function ChallengeList({ auth, onLogout, onAuthSuccess, onChallengeClick }: ChallengeListProps) {
@@ -179,7 +179,7 @@ export function ChallengeList({ auth, onLogout, onAuthSuccess, onChallengeClick 
                 <ChallengeCard
                   key={challenge.id}
                   challenge={challenge}
-                  onClick={() => onChallengeClick(challenge)}
+                  onClick={() => onChallengeClick(challenge.id!)}
                   isAccepted={auth ? auth.acceptedChallengeIds.includes(challenge.id!) : false}
                 />
               ))}
