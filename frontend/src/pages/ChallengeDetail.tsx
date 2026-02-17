@@ -33,6 +33,7 @@ export function ChallengeDetail({
   const [code, setCode] = useState('');
   const [submission, setSubmission] = useState<SubmissionResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -68,7 +69,7 @@ export function ChallengeDetail({
     }
 
     setError(null);
-    setLoading(true);
+    setSubmitting(true);
 
     try {
       const response = await SubmissionsService.submitCode({
@@ -83,7 +84,7 @@ export function ChallengeDetail({
       setError(err?.body?.message || 'Submission failed. Please try again.');
       console.error('Submission error:', err);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -292,10 +293,10 @@ export function ChallengeDetail({
             {/* Submit Button */}
             <button
               onClick={handleSubmit}
-              disabled={!auth || loading}
+              disabled={!auth || submitting}
               className="mt-4 w-full py-3 px-4 bg-CodePurple hover:bg-CodeDarkPurple disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors"
             >
-              {loading ? 'Submitting...' : 'Submit Solution'}
+              {submitting ? 'Submitting...' : 'Submit Solution'}
             </button>
           </div>
 
@@ -315,7 +316,11 @@ export function ChallengeDetail({
               Results
             </h3>
 
-            {!submission ? (
+            {submitting ? (
+              <div className="h-64 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-CodePurple"></div>
+              </div>
+            ) : !submission ? (
               <div className="h-64 flex items-center justify-center">
                 <div className="text-center">
                   <svg
