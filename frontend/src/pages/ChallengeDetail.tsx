@@ -72,13 +72,17 @@ export function ChallengeDetail({
     setSubmitting(true);
 
     try {
+      if (!challenge?.id) {
+        setError('Challenge not loaded');
+        return;
+      }
       const response = await SubmissionsService.submitCode({
-        challengeId: challenge.id!,
+        challengeId: challenge.id,
         code,
       });
       setSubmission(response);
       if (response.status === 'ACCEPTED' && onSubmissionAccepted) {
-        onSubmissionAccepted(challenge.id!);
+        onSubmissionAccepted(challenge.id);
       }
     } catch (err: any) {
       setError(err?.body?.message || 'Submission failed. Please try again.');

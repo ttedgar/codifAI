@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_DB: codifai
       POSTGRES_USER: codifai
-      POSTGRES_PASSWORD: codifai123
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-codifai123}
     ports:
       - "5435:5432"
     volumes:
@@ -17,6 +17,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - codifai-network
 
   judge0-server:
     image: judge0/judge0:1.13.1
@@ -41,6 +43,8 @@ services:
       judge0-redis:
         condition: service_started
     restart: unless-stopped
+    networks:
+      - codifai-network
 
   judge0-db:
     image: postgres:13-alpine
@@ -56,12 +60,16 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - codifai-network
 
   judge0-redis:
     image: redis:6-alpine
     container_name: codifai-judge0-redis
     volumes:
       - judge0_redis_data:/data
+    networks:
+      - codifai-network
 
   backend:
     build: ./backend
@@ -71,16 +79,40 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/codifai
       - SPRING_DATASOURCE_USERNAME=codifai
-      - SPRING_DATASOURCE_PASSWORD=codifai123
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-codifai123}
+      - JWT_SECRET=${JWT_SECRET:-uaVgGWDqWzLjhRMhTE2Ok533xHYL51gqBH6TUs804e2}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
       - JUDGE0_BASE_URL=http://judge0-server:2358
+      - LOGGING_LEVEL_ORG_HIBERNATE=WARN
+      - LOGGING_LEVEL_ORG_HIBERNATE_SQL=WARN
     depends_on:
       postgres:
         condition: service_healthy
       judge0-server:
         condition: service_started
     restart: unless-stopped
+    networks:
+      - codifai-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: codifai-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - codifai-network
 
 volumes:
   postgres_data:
   judge0_postgres_data:
   judge0_redis_data:
+
+networks:
+  codifai-network:
+    driver: bridge

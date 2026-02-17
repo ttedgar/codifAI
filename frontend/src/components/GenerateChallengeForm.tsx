@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChallengesService } from '../api';
+import { ChallengesService, ChallengeRequest } from '../api';
 
 interface GenerateChallengeFormProps {
   isAuthenticated: boolean;
@@ -8,7 +8,7 @@ interface GenerateChallengeFormProps {
 
 export function GenerateChallengeForm({ isAuthenticated, onChallengeGenerated }: GenerateChallengeFormProps) {
   const [prompt, setPrompt] = useState('');
-  const [difficulty, setDifficulty] = useState<'EASY' | 'MEDIUM' | 'HARD'>('EASY');
+  const [difficulty, setDifficulty] = useState<ChallengeRequest.difficulty>(ChallengeRequest.difficulty.EASY);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +32,7 @@ export function GenerateChallengeForm({ isAuthenticated, onChallengeGenerated }:
       if (response.id) {
         // Clear form
         setPrompt('');
-        setDifficulty('EASY');
+        setDifficulty(ChallengeRequest.difficulty.EASY);
         // Navigate to the new challenge
         onChallengeGenerated(response.id);
       }
@@ -90,13 +90,13 @@ export function GenerateChallengeForm({ isAuthenticated, onChallengeGenerated }:
           <select
             id="difficulty"
             value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value as 'EASY' | 'MEDIUM' | 'HARD')}
+            onChange={(e) => setDifficulty(e.target.value as ChallengeRequest.difficulty)}
             disabled={loading}
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-CodePurple disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <option value="EASY">Easy</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HARD">Hard</option>
+            <option value={ChallengeRequest.difficulty.EASY}>Easy</option>
+            <option value={ChallengeRequest.difficulty.MEDIUM}>Medium</option>
+            <option value={ChallengeRequest.difficulty.HARD}>Hard</option>
           </select>
         </div>
 

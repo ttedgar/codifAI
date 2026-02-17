@@ -7,6 +7,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class CorsConfig {
@@ -17,15 +18,16 @@ public class CorsConfig {
 
         // Allow frontend origin
         configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:5173",  // Vite default port
-            "http://localhost:3000"   // Alternative port
+            "http://localhost:3000",  // Docker frontend port
+            "http://localhost:5173",  // Vite default port (development)
+            "http://localhost:80"     // Direct localhost
         ));
 
         // Allow all HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
         // Allow all headers
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(List.of("*"));
 
         // Allow credentials (cookies, authorization headers)
         configuration.setAllowCredentials(true);
