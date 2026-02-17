@@ -1,8 +1,16 @@
 import { useEffect, useState } from 'react';
 import { ChallengesService, ChallengeResponse } from '../api';
 import { ChallengeCard } from '../components/ChallengeCard';
+import { AuthForm } from '../components/AuthForm';
 
-export function ChallengeList() {
+interface ChallengeListProps {
+  auth: { username: string; email: string } | null;
+  onLogout: () => void;
+  onAuthSuccess: (username: string, email: string) => void;
+  onChallengeClick: (challenge: ChallengeResponse) => void;
+}
+
+export function ChallengeList({ auth, onLogout, onAuthSuccess, onChallengeClick }: ChallengeListProps) {
   const [challenges, setChallenges] = useState<ChallengeResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,9 +47,28 @@ export function ChallengeList() {
                 AI-generated coding challenges to sharpen your skills
               </p>
             </div>
-            <button className="px-4 py-2 bg-CodePurple hover:bg-CodeDarkPurple text-white rounded-lg font-medium transition-colors">
-              Generate Challenge
-            </button>
+            <div className="flex items-center gap-6">
+              <button className="px-4 py-2 bg-CodePurple hover:bg-CodeDarkPurple text-white rounded-lg font-medium transition-colors">
+                Generate Challenge
+              </button>
+
+              {/* Auth Section */}
+              {auth ? (
+                <div className="flex items-center gap-4">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Logged in as <span className="font-medium text-gray-900 dark:text-white">{auth.username}</span>
+                  </div>
+                  <button
+                    onClick={onLogout}
+                    className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 font-medium transition-colors"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <AuthForm onAuthSuccess={onAuthSuccess} />
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -152,10 +179,7 @@ export function ChallengeList() {
                 <ChallengeCard
                   key={challenge.id}
                   challenge={challenge}
-                  onClick={() => {
-                    console.log('Challenge clicked:', challenge.id);
-                    // TODO: Navigate to challenge detail page
-                  }}
+                  onClick={() => onChallengeClick(challenge)}
                 />
               ))}
             </div>

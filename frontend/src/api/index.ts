@@ -13,6 +13,9 @@ export { ChallengeResponse } from './models/ChallengeResponse';
 export type { LoginRequest } from './models/LoginRequest';
 export type { PageResponseChallengeResponse } from './models/PageResponseChallengeResponse';
 export type { RegisterRequest } from './models/RegisterRequest';
+export type { SubmissionRequest } from './models/SubmissionRequest';
+export { SubmissionResponse } from './models/SubmissionResponse';
 
 export { AuthenticationService } from './services/AuthenticationService';
 export { ChallengesService } from './services/ChallengesService';
+export { SubmissionsService } from './services/SubmissionsService';
