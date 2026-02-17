@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ChallengesService, ChallengeResponse } from '../api';
 import { ChallengeCard } from '../components/ChallengeCard';
+import { GenerateChallengeForm } from '../components/GenerateChallengeForm';
 import { AuthForm } from '../components/AuthForm';
 
 interface ChallengeListProps {
@@ -48,10 +49,6 @@ export function ChallengeList({ auth, onLogout, onAuthSuccess, onChallengeClick 
               </p>
             </div>
             <div className="flex items-center gap-6">
-              <button className="px-4 py-2 bg-CodePurple hover:bg-CodeDarkPurple text-white rounded-lg font-medium transition-colors">
-                Generate Challenge
-              </button>
-
               {/* Auth Section */}
               {auth ? (
                 <div className="flex items-center gap-4">
@@ -76,7 +73,7 @@ export function ChallengeList({ auth, onLogout, onAuthSuccess, onChallengeClick 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         {/* Stats Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center">
             <div className="text-3xl font-bold text-CodePurple dark:text-CodeLightPurple mb-2">
               {challenges.length}
@@ -94,6 +91,14 @@ export function ChallengeList({ auth, onLogout, onAuthSuccess, onChallengeClick 
             </div>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center">
+            <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mb-2">
+              {challenges.filter((c) => c.difficulty === 'MEDIUM').length}
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              Medium Challenges
+            </div>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center">
             <div className="text-3xl font-bold text-red-600 dark:text-red-400 mb-2">
               {challenges.filter((c) => c.difficulty === 'HARD').length}
             </div>
@@ -102,6 +107,12 @@ export function ChallengeList({ auth, onLogout, onAuthSuccess, onChallengeClick 
             </div>
           </div>
         </div>
+
+        {/* Generate Challenge Form */}
+        <GenerateChallengeForm
+          isAuthenticated={!!auth}
+          onChallengeGenerated={onChallengeClick}
+        />
 
         {/* Challenges Grid */}
         <div className="mb-6">
@@ -163,12 +174,9 @@ export function ChallengeList({ auth, onLogout, onAuthSuccess, onChallengeClick 
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 No challenges yet
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Get started by generating your first AI challenge!
+              <p className="text-gray-600 dark:text-gray-400">
+                Get started by generating your first AI challenge using the form above!
               </p>
-              <button className="px-6 py-3 bg-CodePurple hover:bg-CodeDarkPurple text-white rounded-lg font-medium transition-colors">
-                Generate Challenge
-              </button>
             </div>
           )}
 
