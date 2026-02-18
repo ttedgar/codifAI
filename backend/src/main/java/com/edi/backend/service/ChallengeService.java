@@ -26,7 +26,7 @@ public class ChallengeService {
 
     private final ChallengeRepository challengeRepository;
     private final UserRepository userRepository;
-    private final GeminiService geminiService;
+    private final AiChallengeGenerator aiChallengeGenerator;
 
     @Transactional(readOnly = true)
     public PageResponse<ChallengeResponse> getAllChallenges(int page, int size, String sortBy) {
@@ -54,17 +54,14 @@ public class ChallengeService {
 
     @Transactional
     public ChallengeResponse createChallenge(ChallengeRequest request) {
-        // Get existing challenge titles to avoid duplicates
         List<String> existingTitles = challengeRepository.findAllTitles();
 
-        // Call Gemini to generate challenge
-        ChallengeGenerationRequest generated = geminiService.generateChallenge(
+        ChallengeGenerationRequest generated = aiChallengeGenerator.generateChallenge(
                 request.getPrompt(),
                 request.getDifficulty(),
                 existingTitles
         );
 
-        // Create and save challenge
         Challenge challenge = Challenge.builder()
                 .title(generated.getTitle())
                 .description(generated.getDescription())
@@ -84,7 +81,6 @@ public class ChallengeService {
         Challenge challenge = challengeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Challenge not found with id: " + id));
 
-        // Only ADMIN can delete challenges
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));

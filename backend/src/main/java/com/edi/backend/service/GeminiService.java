@@ -16,7 +16,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class GeminiService {
+public class GeminiService implements AiChallengeGenerator {
 
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
@@ -54,7 +54,6 @@ public class GeminiService {
                 throw new RuntimeException("Gemini API returned empty text content");
             }
 
-            // Strip markdown code fence if present
             generatedText = generatedText.trim();
             if (generatedText.startsWith("```json")) {
                 generatedText = generatedText.substring(7);
