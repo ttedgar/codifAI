@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AuthenticationService } from '../api';
 
 interface AuthFormProps {
-  onAuthSuccess: (username: string, email: string) => void;
+  onAuthSuccess: (username: string, email: string, acceptedChallengeIds: number[]) => void;
 }
 
 export function AuthForm({ onAuthSuccess }: AuthFormProps) {
@@ -32,7 +32,8 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
           localStorage.setItem('email', response.email || '');
           onAuthSuccess(
             response.username || '',
-            response.email || ''
+            response.email || '',
+            response.acceptedChallengeIds || []
           );
           setIsOpen(false);
           // Reset form
@@ -53,7 +54,8 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
           localStorage.setItem('email', response.email || '');
           onAuthSuccess(
             response.username || '',
-            response.email || ''
+            response.email || '',
+            response.acceptedChallengeIds || []
           );
           setIsOpen(false);
           // Reset form

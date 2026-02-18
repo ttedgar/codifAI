@@ -9,5 +9,6 @@ export type AuthResponse = {
     username?: string;
     email?: string;
     role?: string;
+    acceptedChallengeIds?: number[];
 };
 
