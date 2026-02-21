@@ -14,20 +14,49 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already logged in
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('username');
     const email = localStorage.getItem('email');
     const acceptedChallengeIdsStr = localStorage.getItem('acceptedChallengeIds');
 
     if (token && username && email) {
+      validateToken(token, username, email, acceptedChallengeIdsStr)
+        .catch(() => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('username');
+          localStorage.removeItem('email');
+          localStorage.removeItem('acceptedChallengeIds');
+          setAuth(null);
+        });
+    }
+  }, []);
+
+  const validateToken = async (
+    token: string,
+    username: string,
+    email: string,
+    acceptedChallengeIdsStr: string | null
+  ) => {
+    try {
+      const response = await fetch('http://localhost:8080/api/challenges?page=0&size=1', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Token expired');
+      }
+
       setAuth({
         username,
         email,
         acceptedChallengeIds: acceptedChallengeIdsStr ? JSON.parse(acceptedChallengeIdsStr) : [],
       });
+    } catch (error) {
+      throw error;
     }
-  }, []);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
