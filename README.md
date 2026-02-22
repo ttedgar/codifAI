@@ -7,7 +7,7 @@ A modern fullstack application for creating, sharing, and solving JavaScript cod
 ## 🚀 Start
 
 ### Prerequisites
-Only **Docker & Docker Compose** required. Nothing else needed on your machine.
+Only **Docker & Docker Compose** required.
 
 ### Setup & Run
 
@@ -128,6 +128,14 @@ Once `docker-compose up` is running:
 Click "Sign In" → Register new account
 Enter email, username, password → Account created
 ```
+
+#### Default Admin Account
+```
+Email:    admin@admin.admin
+Username: admin
+Password: admin
+```
+This admin account is automatically created on first startup and can delete challenges.
 
 ### 2. Browse Challenges
 ```
