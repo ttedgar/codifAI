@@ -6,6 +6,9 @@ import com.edi.backend.entity.Challenge;
 import com.edi.backend.entity.Submission;
 import com.edi.backend.entity.SubmissionStatus;
 import com.edi.backend.entity.User;
+import com.edi.backend.exception.ChallengeNotFoundException;
+import com.edi.backend.exception.CodeExecutionException;
+import com.edi.backend.exception.UserNotFoundException;
 import com.edi.backend.repository.ChallengeRepository;
 import com.edi.backend.repository.SubmissionRepository;
 import com.edi.backend.repository.UserRepository;
@@ -31,7 +34,7 @@ public class CodeExecutionService {
         log.info("Evaluating submission for user {} on challenge {}", userId, challengeId);
 
         Challenge challenge = challengeRepository.findById(challengeId)
-                .orElseThrow(() -> new RuntimeException("Challenge not found"));
+                .orElseThrow(() -> new ChallengeNotFoundException(challengeId));
 
         String combinedCode = buildExecutableCode(userCode, challenge.getHiddenTests());
 
@@ -40,7 +43,7 @@ public class CodeExecutionService {
             result = codeExecutor.execute(combinedCode, "");
         } catch (Exception e) {
             log.error("Code execution failed", e);
-            return createFailedSubmission(userId, challengeId, userCode, "Execution service unavailable");
+            throw new CodeExecutionException("Execution service unavailable", e);
         }
 
         SubmissionStatus status = determineStatus(result);
@@ -144,7 +147,7 @@ public class CodeExecutionService {
 
     private void awardXP(Long userId, Challenge challenge) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         int xpToAward = switch (challenge.getDifficulty()) {
             case EASY -> 10;
@@ -158,21 +161,6 @@ public class CodeExecutionService {
         log.info("Awarded {} XP to user {} for solving challenge {}", xpToAward, userId, challenge.getId());
     }
 
-    private SubmissionResponse createFailedSubmission(Long userId, Long challengeId, String code, String errorMessage) {
-        Submission submission = Submission.builder()
-                .userId(userId)
-                .challengeId(challengeId)
-                .code(code)
-                .status(SubmissionStatus.RUNTIME_ERROR)
-                .stdout(null)
-                .stderr(errorMessage)
-                .executionTime(null)
-                .memory(null)
-                .build();
-
-        submission = submissionRepository.save(submission);
-        return mapToResponse(submission);
-    }
 
     private SubmissionResponse mapToResponse(Submission submission) {
         return SubmissionResponse.builder()

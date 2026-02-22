@@ -6,6 +6,8 @@ import com.edi.backend.dto.RegisterRequest;
 import com.edi.backend.entity.Role;
 import com.edi.backend.entity.SubmissionStatus;
 import com.edi.backend.entity.User;
+import com.edi.backend.exception.DuplicateUserException;
+import com.edi.backend.exception.UserNotFoundException;
 import com.edi.backend.repository.SubmissionRepository;
 import com.edi.backend.repository.UserRepository;
 import com.edi.backend.security.JwtUtil;
@@ -32,10 +34,10 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new DuplicateUserException("email", request.getEmail());
         }
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new DuplicateUserException("username", request.getUsername());
         }
 
         User user = User.builder()
@@ -67,7 +69,7 @@ public class AuthService {
         );
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
         String token = jwtUtil.generateToken(userDetails);

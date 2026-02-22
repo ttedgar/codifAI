@@ -7,6 +7,9 @@ import com.edi.backend.dto.PageResponse;
 import com.edi.backend.entity.Challenge;
 import com.edi.backend.entity.Role;
 import com.edi.backend.entity.User;
+import com.edi.backend.exception.AuthorizationException;
+import com.edi.backend.exception.ChallengeNotFoundException;
+import com.edi.backend.exception.UserNotFoundException;
 import com.edi.backend.repository.ChallengeRepository;
 import com.edi.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +51,7 @@ public class ChallengeService {
     @Transactional(readOnly = true)
     public ChallengeResponse getChallengeById(Long id) {
         Challenge challenge = challengeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Challenge not found with id: " + id));
+                .orElseThrow(() -> new ChallengeNotFoundException(id));
         return mapToResponse(challenge);
     }
 
@@ -79,14 +82,14 @@ public class ChallengeService {
     @Transactional
     public void deleteChallenge(Long id) {
         Challenge challenge = challengeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Challenge not found with id: " + id));
+                .orElseThrow(() -> new ChallengeNotFoundException(id));
 
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (user.getRole() != Role.ADMIN) {
-            throw new RuntimeException("Only administrators can delete challenges");
+            throw new AuthorizationException("Only administrators can delete challenges");
         }
 
         challengeRepository.delete(challenge);

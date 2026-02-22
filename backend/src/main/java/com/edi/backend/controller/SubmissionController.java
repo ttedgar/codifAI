@@ -3,6 +3,7 @@ package com.edi.backend.controller;
 import com.edi.backend.dto.SubmissionRequest;
 import com.edi.backend.dto.SubmissionResponse;
 import com.edi.backend.entity.User;
+import com.edi.backend.exception.UserNotFoundException;
 import com.edi.backend.repository.UserRepository;
 import com.edi.backend.service.CodeExecutionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +32,7 @@ public class SubmissionController {
         // Get authenticated user
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         // Evaluate submission
         SubmissionResponse response = codeExecutionService.evaluateSubmission(

@@ -2,6 +2,7 @@ package com.edi.backend.service;
 
 import com.edi.backend.dto.ChallengeGenerationRequest;
 import com.edi.backend.entity.Difficulty;
+import com.edi.backend.exception.ChallengeGenerationException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class GeminiService implements AiChallengeGenerator {
                     .block();
 
             if (response == null) {
-                throw new RuntimeException("Gemini API returned null response");
+                throw new ChallengeGenerationException("Gemini API returned null response");
             }
 
             String generatedText = response
@@ -51,7 +52,7 @@ public class GeminiService implements AiChallengeGenerator {
                     .asText();
 
             if (generatedText.isEmpty()) {
-                throw new RuntimeException("Gemini API returned empty text content");
+                throw new ChallengeGenerationException("Gemini API returned empty text content");
             }
 
             generatedText = generatedText.trim();
@@ -67,9 +68,12 @@ public class GeminiService implements AiChallengeGenerator {
 
             log.info("Generated text: " + generatedText);
             return parseGeneratedChallenge(generatedText);
+        } catch (ChallengeGenerationException e) {
+            log.error("Challenge generation error", e);
+            throw e;
         } catch (Exception e) {
             log.error("Error calling Gemini API", e);
-            throw new RuntimeException("Failed to generate challenge: " + e.getMessage(), e);
+            throw new ChallengeGenerationException("Failed to generate challenge: " + e.getMessage(), e);
         }
     }
 
@@ -142,7 +146,7 @@ public class GeminiService implements AiChallengeGenerator {
                     .build();
         } catch (Exception e) {
             log.error("Error parsing generated challenge JSON", e);
-            throw new RuntimeException("Failed to parse generated challenge: " + e.getMessage(), e);
+            throw new ChallengeGenerationException("Failed to parse generated challenge: " + e.getMessage(), e);
         }
     }
 }

@@ -3,6 +3,7 @@ package com.edi.backend.service;
 import com.edi.backend.dto.CodeExecutionResult;
 import com.edi.backend.dto.Judge0ResultResponse;
 import com.edi.backend.dto.Judge0SubmissionRequest;
+import com.edi.backend.exception.CodeExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -54,7 +55,7 @@ public class Judge0Service implements CodeExecutor {
                 .block(Duration.ofMillis(timeout));
 
         if (response == null) {
-            throw new RuntimeException("Failed to execute code via Judge0");
+            throw new CodeExecutionException("Failed to execute code via Judge0");
         }
 
         decodeBase64Fields(response);
