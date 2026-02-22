@@ -4,6 +4,8 @@ interface ChallengeCardProps {
   challenge: ChallengeResponse;
   onClick?: () => void;
   isAccepted?: boolean;
+  isAdmin?: boolean;
+  onDelete?: (id: number) => void;
 }
 
 const difficultyColors: Record<string, string> = {
@@ -12,7 +14,14 @@ const difficultyColors: Record<string, string> = {
   HARD: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
 };
 
-export function ChallengeCard({ challenge, onClick, isAccepted }: ChallengeCardProps) {
+export function ChallengeCard({ challenge, onClick, isAccepted, isAdmin, onDelete }: ChallengeCardProps) {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDelete && challenge.id) {
+      onDelete(challenge.id);
+    }
+  };
+
   return (
     <div
       onClick={onClick}
@@ -42,6 +51,21 @@ export function ChallengeCard({ challenge, onClick, isAccepted }: ChallengeCardP
           >
             {challenge.difficulty || 'EASY'}
           </span>
+          {isAdmin && (
+            <button
+              onClick={handleDelete}
+              className="ml-1 p-1.5 rounded bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+              title="Delete challenge"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 

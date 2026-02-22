@@ -2,10 +2,14 @@ package com.edi.backend.service;
 
 import com.edi.backend.entity.Challenge;
 import com.edi.backend.entity.Difficulty;
+import com.edi.backend.entity.Role;
+import com.edi.backend.entity.User;
 import com.edi.backend.repository.ChallengeRepository;
+import com.edi.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -16,9 +20,13 @@ import java.util.Arrays;
 public class InitService implements CommandLineRunner {
 
     private final ChallengeRepository challengeRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
+        createAdminUser();
+
         if (challengeRepository.count() > 0) {
             log.info("Challenges already exist, skipping initialization");
             return;
@@ -29,6 +37,24 @@ public class InitService implements CommandLineRunner {
         createChallenge2();
         createChallenge3();
         log.info("Database initialization complete!");
+    }
+
+    private void createAdminUser() {
+        if (userRepository.existsByEmail("admin@admin.admin")) {
+            log.info("Admin user already exists, skipping creation");
+            return;
+        }
+
+        User adminUser = User.builder()
+                .username("admin")
+                .email("admin@admin.admin")
+                .password(passwordEncoder.encode("admin"))
+                .role(Role.ADMIN)
+                .xp(0)
+                .build();
+
+        userRepository.save(adminUser);
+        log.info("Created admin user: admin@admin.admin");
     }
 
     private void createChallenge1() {

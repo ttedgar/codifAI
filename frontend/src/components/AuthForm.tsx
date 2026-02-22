@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AuthenticationService } from '../api';
 
 interface AuthFormProps {
-  onAuthSuccess: (username: string, email: string, acceptedChallengeIds: number[]) => void;
+  onAuthSuccess: (username: string, email: string, role: string, acceptedChallengeIds: number[]) => void;
 }
 
 export function AuthForm({ onAuthSuccess }: AuthFormProps) {
@@ -30,9 +30,11 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
           localStorage.setItem('token', response.token);
           localStorage.setItem('username', response.username || '');
           localStorage.setItem('email', response.email || '');
+          localStorage.setItem('role', response.role || 'USER');
           onAuthSuccess(
             response.username || '',
             response.email || '',
+            response.role || 'USER',
             response.acceptedChallengeIds || []
           );
           setIsOpen(false);
@@ -52,9 +54,11 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
           localStorage.setItem('token', response.token);
           localStorage.setItem('username', response.username || '');
           localStorage.setItem('email', response.email || '');
+          localStorage.setItem('role', response.role || 'USER');
           onAuthSuccess(
             response.username || '',
             response.email || '',
+            response.role || 'USER',
             response.acceptedChallengeIds || []
           );
           setIsOpen(false);

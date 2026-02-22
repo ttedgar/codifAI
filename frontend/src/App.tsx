@@ -6,6 +6,7 @@ import { ChallengeDetail } from './pages/ChallengeDetail';
 interface AuthState {
   username: string;
   email: string;
+  role: string;
   acceptedChallengeIds: number[];
 }
 
@@ -17,14 +18,16 @@ function App() {
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('username');
     const email = localStorage.getItem('email');
+    const role = localStorage.getItem('role');
     const acceptedChallengeIdsStr = localStorage.getItem('acceptedChallengeIds');
 
-    if (token && username && email) {
-      validateToken(token, username, email, acceptedChallengeIdsStr)
+    if (token && username && email && role) {
+      validateToken(token, username, email, role, acceptedChallengeIdsStr)
         .catch(() => {
           localStorage.removeItem('token');
           localStorage.removeItem('username');
           localStorage.removeItem('email');
+          localStorage.removeItem('role');
           localStorage.removeItem('acceptedChallengeIds');
           setAuth(null);
         });
@@ -35,6 +38,7 @@ function App() {
     token: string,
     username: string,
     email: string,
+    role: string,
     acceptedChallengeIdsStr: string | null
   ) => {
     try {
@@ -51,6 +55,7 @@ function App() {
       setAuth({
         username,
         email,
+        role,
         acceptedChallengeIds: acceptedChallengeIdsStr ? JSON.parse(acceptedChallengeIdsStr) : [],
       });
     } catch (error) {
@@ -62,6 +67,7 @@ function App() {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     localStorage.removeItem('email');
+    localStorage.removeItem('role');
     localStorage.removeItem('acceptedChallengeIds');
     setAuth(null);
   };
@@ -69,9 +75,10 @@ function App() {
   const handleAuthSuccess = (
     username: string,
     email: string,
+    role: string,
     acceptedChallengeIds: number[] = []
   ) => {
-    setAuth({ username, email, acceptedChallengeIds });
+    setAuth({ username, email, role, acceptedChallengeIds });
   };
 
   const addAcceptedChallenge = (challengeId: number) => {

@@ -5,9 +5,9 @@ import { GenerateChallengeForm } from '../components/GenerateChallengeForm';
 import { AuthForm } from '../components/AuthForm';
 
 interface ChallengeListProps {
-  auth: { username: string; email: string; acceptedChallengeIds: number[] } | null;
+  auth: { username: string; email: string; role: string; acceptedChallengeIds: number[] } | null;
   onLogout: () => void;
-  onAuthSuccess: (username: string, email: string, acceptedChallengeIds?: number[]) => void;
+  onAuthSuccess: (username: string, email: string, role: string, acceptedChallengeIds?: number[]) => void;
   onChallengeClick: (challengeId: number) => void;
 }
 
@@ -34,6 +34,26 @@ export function ChallengeList({ auth, onLogout, onAuthSuccess, onChallengeClick 
     }
   };
 
+  const handleDeleteChallenge = async (challengeId: number) => {
+    if (!confirm('Are you sure you want to delete this challenge? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`http://localhost:8080/api/challenges/${challengeId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      setChallenges(challenges.filter(c => c.id !== challengeId));
+    } catch (err) {
+      console.error('Error deleting challenge:', err);
+      setError('Failed to delete challenge. Please try again.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Header */}
@@ -54,6 +74,11 @@ export function ChallengeList({ auth, onLogout, onAuthSuccess, onChallengeClick 
                 <div className="flex items-center gap-4">
                   <div className="text-sm text-gray-600 dark:text-gray-400">
                     Logged in as <span className="font-medium text-gray-900 dark:text-white">{auth.username}</span>
+                    {auth.role === 'ADMIN' && (
+                      <span className="ml-2 inline-block px-2 py-1 text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded">
+                        ADMIN
+                      </span>
+                    )}
                   </div>
                   <button
                     onClick={onLogout}
@@ -189,6 +214,8 @@ export function ChallengeList({ auth, onLogout, onAuthSuccess, onChallengeClick 
                   challenge={challenge}
                   onClick={() => onChallengeClick(challenge.id!)}
                   isAccepted={auth ? auth.acceptedChallengeIds.includes(challenge.id!) : false}
+                  isAdmin={auth?.role === 'ADMIN'}
+                  onDelete={handleDeleteChallenge}
                 />
               ))}
             </div>
