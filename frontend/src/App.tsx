@@ -38,14 +38,14 @@ function App() {
     acceptedChallengeIdsStr: string | null
   ) => {
     try {
-      const response = await fetch('http://localhost:8080/api/challenges?page=0&size=1', {
+      const response = await fetch('http://localhost:8080/api/auth/validate', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
 
       if (response.status === 401 || response.status === 403) {
-        throw new Error('Token expired');
+        throw new Error('Token expired or invalid');
       }
 
       setAuth({

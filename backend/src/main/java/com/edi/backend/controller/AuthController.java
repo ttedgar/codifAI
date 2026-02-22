@@ -5,6 +5,7 @@ import com.edi.backend.dto.LoginRequest;
 import com.edi.backend.dto.RegisterRequest;
 import com.edi.backend.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +30,12 @@ public class AuthController {
     @Operation(summary = "Login", description = "Authenticates user and returns JWT token")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @GetMapping("/validate")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Validate token", description = "Validates that the provided JWT token is still valid (requires authentication)")
+    public ResponseEntity<Void> validateToken() {
+        return ResponseEntity.ok().build();
     }
 }
