@@ -5,19 +5,13 @@ import com.edi.backend.dto.ChallengeRequest;
 import com.edi.backend.dto.ChallengeResponse;
 import com.edi.backend.dto.PageResponse;
 import com.edi.backend.entity.Challenge;
-import com.edi.backend.entity.Role;
-import com.edi.backend.entity.User;
-import com.edi.backend.exception.AuthorizationException;
 import com.edi.backend.exception.ChallengeNotFoundException;
-import com.edi.backend.exception.UserNotFoundException;
 import com.edi.backend.repository.ChallengeRepository;
-import com.edi.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +22,6 @@ import java.util.List;
 public class ChallengeService {
 
     private final ChallengeRepository challengeRepository;
-    private final UserRepository userRepository;
     private final AiChallengeGenerator aiChallengeGenerator;
 
     @Transactional(readOnly = true)
@@ -83,14 +76,6 @@ public class ChallengeService {
     public void deleteChallenge(Long id) {
         Challenge challenge = challengeRepository.findById(id)
                 .orElseThrow(() -> new ChallengeNotFoundException(id));
-
-        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        if (user.getRole() != Role.ADMIN) {
-            throw new AuthorizationException("Only administrators can delete challenges");
-        }
 
         challengeRepository.delete(challenge);
     }
